@@ -1,0 +1,21 @@
+R: 400
+model: cstr_vrnn_5_cpu.pkl
+simulation: cstr_vrnn_5_cpu.pkl
+planning: cstr_vrnn_5_cpu.pkl
+ip: localhost
+v: false
+service: false
+cuda: -1
+length: 50
+num_samples: 32
+num_iters: 32
+r,random_seed: 1
+dataset: ./data/southeast
+input_dim: 1
+output_dim: 2
+set_value:
+- 0.8
+- 0.1
+- 0.5
+port: 6010
+debug: false

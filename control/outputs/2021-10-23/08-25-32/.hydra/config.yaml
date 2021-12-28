@@ -1,0 +1,17 @@
+algorithm:
+  name: cem
+  length: 50
+  num_samples: 32
+  num_iters: 32
+  max_iters: 50
+model: control.pkl
+cuda: 0
+input_dim: 3
+output_dim: 3
+controlled_ids: all
+default_set_point:
+- 0.8
+- 0.1
+- 0.5
+debug: false
+port: 6010

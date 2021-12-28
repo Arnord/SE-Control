@@ -1,0 +1,29 @@
+R: 400
+model: model_best_510.pth.tar
+ip: localhost
+v: false
+service: false
+cuda: 0
+length: 50
+num_samples: 32
+num_iters: 32
+random_seed: 1
+dataset: ./data/ib
+input_dim: 5
+output_dim: 1
+used_columns:
+- v_in
+- c_in
+- v_out
+- c_out
+- pressure
+- c_out
+set_value:
+- -1
+- -1
+- 1
+port: 6010
+debug: false
+use_benchmark: false
+benchmark: ib
+modeltype: darts

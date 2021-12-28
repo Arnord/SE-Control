@@ -1,0 +1,23 @@
+R: 400
+model: ib_vrnn_5_1026.pkl
+simulation: control.pkl
+planning: control.pkl
+ip: localhost
+v: false
+service: false
+cuda: 0
+length: 50
+num_samples: 32
+num_iters: 32
+random_seed: 1
+dataset: ./data/ib
+input_dim: 3
+output_dim: 3
+set_value:
+- -1
+- -1
+- 1
+port: 6010
+debug: false
+use_benchmark: true
+benchmark: ib

@@ -1,0 +1,6 @@
+name: pid
+length: 50 # help="The length of optimized sequence for planning"
+dt: 0.5 # loop time
+KP: 2 # Proportional gain
+KI: 1 # Integral gain
+KD: 1 # Differential gain

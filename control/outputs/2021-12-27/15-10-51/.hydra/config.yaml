@@ -1,0 +1,14 @@
+algorithm:
+  name: pid
+  dt: 0.1
+  KP: 2
+  KI: 1
+  KD: 1
+cuda: 0
+controlled_ids: all
+default_set_point: 10
+debug: false
+process_value: null
+max: 300
+min: 0
+port: 6010
