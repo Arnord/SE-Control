@@ -8,12 +8,12 @@ class DataFrameScalar:
         self.std = pd.DataFrame()
 
     def get_stats(self):
-        return self.mean, self.std
+        return self.mean.values, self.std.values
 
     def set_stats(self, df):
         self.mean = df.mean(numeric_only=True)
         self.std = df.std(numeric_only=True)
-        return self.mean, self.std
+        return self.mean.values, self.std.values
 
     def transform(self, df, stats_columns: list, inplace=False):
         self.set_stats(df)
