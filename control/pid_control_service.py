@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
-import numpy as np
 import os
 import json
 
@@ -10,7 +9,7 @@ from flask import Flask, jsonify, request
 import sys
 from control.algorithms.pid_planning import PIDPlanning
 import time
-from control.utils import dict_to_Tensor, my_JSON_serializable, DictConfig2dict
+from utils.utils import dict_to_Tensor, my_JSON_serializable, DictConfig2dict
 import hydra
 from omegaconf import DictConfig
 sys.path.append('..')
@@ -19,7 +18,7 @@ sys.path.append(os.getcwd())
 app = Flask(__name__)
 
 controller_info = {
-    'model': None,
+    'trained_model': None,
     'device': None,
     'args': None,
     'op_var': None,     # 优化目标，pid中为底流流量的值

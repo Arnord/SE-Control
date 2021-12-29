@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
-import numpy as np
 import os
 import json
 
@@ -13,7 +12,7 @@ sys.path.append(os.getcwd())
 from control.algorithms.cem_planning import CEMPlanning
 from control.algorithms.Test import TestController
 import time
-from control.utils import dict_to_Tensor, my_JSON_serializable, DictConfig2dict
+from utils.utils import dict_to_Tensor, my_JSON_serializable, DictConfig2dict
 import hydra
 from omegaconf import DictConfig
 
@@ -21,7 +20,7 @@ app = Flask(__name__)
 
 # 此处load模型
 controller_info = {
-    'model': None,
+    'trained_model': None,
     'device': None,
     'args': None,
     'last_seq_distribution': None,
@@ -77,7 +76,7 @@ def cem_planning():     # Cem规划控制
         else:
             raise NotImplementedError
 
-        new_dist, action_f = planner.solve(controller_info['model'], memory_state, last_seq_distribution=controller_info['last_seq_distribution'])
+        new_dist, action_f = planner.solve(controller_info['trained_model'], memory_state, last_seq_distribution=controller_info['last_seq_distribution'])
         # action_f 为cem loss最小的动作序列的均值
         controller_info['last_seq_distribution'] = new_dist
         # TODO: 不要出现for循环
@@ -132,7 +131,7 @@ def update():      # 更新隐状态
             [x[1] for x in new_monitoring_data], controller_info['device']
         ).unsqueeze(dim=1)  # (len, bs=1, output_dim)
 
-        _, new_memory_state = controller_info['model'].forward_posterior(
+        _, new_memory_state = controller_info['trained_model'].forward_posterior(
             external_input, observations_seq, memory_state=memory_state
         )
 
@@ -157,7 +156,7 @@ def control_service_start(args: DictConfig):
         raise RuntimeError('cuda %s invalid device ordinal' % args.cuda)
 
     device = torch.device("cuda:{}".format(str(args.cuda)) if torch.cuda.is_available() and args.cuda != -1 else "cpu")
-    model_path = os.path.join(hydra.utils.get_original_cwd(), 'model', args.model)
+    model_path = os.path.join(hydra.utils.get_original_cwd(), 'trained_model', args.model)
     model = torch.load(model_path, map_location=device)
     model = model.to(device)
     model.eval()
@@ -165,7 +164,7 @@ def control_service_start(args: DictConfig):
     global controller_info
     # 向controller_info中添加模型或其他参数
     controller_info['device'] = device
-    controller_info['model'] = model
+    controller_info['trained_model'] = model
     controller_info['args'] = args
     print(args)
     # controller_info['scale'] = Scale(mean=np.zeros(5), std=np.ones(5))  # 此处需要利用数据集进行估计，应保持和训练时的归一化一致
@@ -181,15 +180,15 @@ def control_service_start(args: DictConfig):
 if __name__ == '__main__':
 
     # parser = argparse.ArgumentParser('Pressure Control Test')
-    # parser.add_argument('--model',  type=str, default='control/model/cstr_vrnn_5.pkl', help="ckpt path of planning model.")
-    # parser.add_argument('--planning',  type=str, default='control/model/cstr_vrnn_5.pkl', help="ckpt path of planning model.")
+    # parser.add_argument('--trained_model',  type=str, default='control/trained_model/cstr_vrnn_5.pkl', help="ckpt path of planning trained_model.")
+    # parser.add_argument('--planning',  type=str, default='control/trained_model/cstr_vrnn_5.pkl', help="ckpt path of planning trained_model.")
     # parser.add_argument('--cuda',  type=int, default=3, help="GPU ID, -1 for CPU")
     # parser.add_argument('--length',  type=int, default=50, help="The length of optimized sequence for planning")
     # parser.add_argument('--num_samples',  type=int, default=32, help="The number of samples in CEM planning")
     # parser.add_argument('--num_iters',  type=int, default=32, help="The number of iters in CEM planning")
     # parser.add_argument('--max_iters',  type=int, default=50, help="The number of iters in CEM planning")
-    # parser.add_argument('--input_dim', type=int, default=1, help='The input_dim of model')
-    # parser.add_argument('--output_dim', type=int, default=2, help='The output_dim of model')
+    # parser.add_argument('--input_dim', type=int, default=1, help='The input_dim of trained_model')
+    # parser.add_argument('--output_dim', type=int, default=2, help='The output_dim of trained_model')
     # parser.add_argument('--set_value', type=list, default=[0.8,0.1,0.5], help='The set_value of control')  # 0.8[number of output_dim; number of input_dim]
     # parser.add_argument('--port',  type=int, default=6010, help="The number of iters in CEM planning")
     # parser.add_argument('--debug', action='store_true', default=False)

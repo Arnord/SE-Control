@@ -5,10 +5,9 @@ import math
 import os
 import json
 
-import torch
 
 # 归一化
-class Scale:
+class arrayScalar:
     def __init__(self, mean, std):
         self.mean = mean
         self.std = std

@@ -1,19 +1,9 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
-import numpy as np
-import math
 import os
-import json
-import time
 import torch
-import hydra
 import random
-import pandas as pd
-from control.utils import dict_to_Tensor
-from common import detect_download
-from control.scale import Scale
 from matplotlib import pyplot as plt
-from common import normal_interval
 
 
 class ThickenerPressureSimulation:
@@ -82,7 +72,7 @@ class ThickenerPressureSimulation:
         v_out_new = v_out_new.unsqueeze(0).unsqueeze(0).unsqueeze(0)      # Tensor (1,1,1)
         '''
         external_input_seq = torch.tensor(planning_action, dtype=torch.float32).to(self.device).unsqueeze(0).unsqueeze(0)
-        # output, _ = self.model.forward_prediction(, max_prob=True, memory_state=memory_state)
+        # output, _ = self.trained_model.forward_prediction(, max_prob=True, memory_state=memory_state)
         output, new_memory_state = self.model.forward_prediction(external_input_seq,  max_prob=True, memory_state=self.memory_state)
         pred_observations_sample = output['predicted_seq']
         pred_observations_sample = pred_observations_sample.cpu().detach()
@@ -116,9 +106,8 @@ class ThickenerPressureSimulation:
                 plt.ylabel("control_value")
                 plt.legend()
                 try:
-                    # TODO: 此处string + int 会 报错
                     plt.savefig(
-                        os.path.join(self.figs_path, 'simulation_'+str(pos)+'_'+str(self.border)+'_.png')
+                        os.path.join(self.figs_path, f'simulation_{pos}_{self.border}.png')
                     )
                 except Exception as e:
                     # import pdb

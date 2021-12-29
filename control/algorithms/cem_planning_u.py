@@ -1,20 +1,13 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
 import numpy as np
-import math
 import os
-import json
 
 import torch
-import pandas as pd
-import copy
 from torch.distributions.normal import Normal
-from control.thickener_pressure_simulation import ThickenerPressureSimulation
-from control.scale import Scale
-from matplotlib import pyplot as plt
+
+
 #####
-from model.func import normal_differential_sample
-from model.common import DiagMultivariateNormal as MultivariateNormal
 #####
 class CEMPlanning:
 
@@ -67,7 +60,6 @@ class CEMPlanning:
         obs_set_value = obs_set_value.expand(self.num_samples, self.length, self.output_dim).to(self.device).contiguous()  #
         obs = obs.permute(2, 0, 1).contiguous()
         obs_set_value = obs_set_value.permute(2, 0, 1).contiguous()
-        # TODO: 不许出现for循环
         mse_list = [MSE(obs_set_value[x].unsqueeze(-1), obs[x].unsqueeze(-1)).mean(dim=1) for x in range(0, self.output_dim)]
         loss = 0
         # for i in range(0,self.output_dim):
@@ -132,12 +124,12 @@ class CEMPlanning:
                 action_j = action_j.permute(1, 2, 0).contiguous()
                 u_j = u_j.permute(1, 2, 0).contiguous()
 
-                # action_j归一化   # TODO: 兼容性问题，model.mean需要兼容不同系统，后续修改为对应action_name的mean.values
+                # action_j归一化   # TODO: 兼容性问题，trained_model.mean需要兼容不同系统，后续修改为对应action_name的mean.values
                 aj_mean = torch.from_numpy(np.array(self.model.mean.values.tolist()[1:4])).expand(action_j.shape).contiguous().to(self.device)
                 aj_std = torch.from_numpy(np.array(self.model.std.values.tolist()[1:4])).expand(action_j.shape).contiguous().to(self.device)
                 action_j = ( action_j - aj_mean ) / aj_std
                 # action_j变维
-                action_j = action_j.permute(1, 0, 2).contiguous()      # model.forward_prediction(([len, batch_size, input_size]), memory_state)
+                action_j = action_j.permute(1, 0, 2).contiguous()      # trained_model.forward_prediction(([len, batch_size, input_size]), memory_state)
                 # TODO : 不同的模型memory_state定义不同，需要兼容
                 memory_state['hn'] = memory_state['hn'].expand(self.num_samples, memory_state['hn'].shape[-1]).contiguous()
                 memory_state['rnn_hidden'] = memory_state['rnn_hidden'].expand(memory_state['rnn_hidden'].shape[0], self.num_samples, memory_state['rnn_hidden'].shape[-1]).contiguous()

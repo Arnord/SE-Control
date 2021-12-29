@@ -1,8 +1,6 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
 import hydra
-import numpy as np
-import math
 import os
 import json
 
@@ -13,8 +11,7 @@ import torch
 
 import requests
 import time
-import argparse
-from common import SimpleLogger
+from utils.common import SimpleLogger
 from control.thickener_pressure_simulation import ThickenerPressureSimulation
 from control.industrial_benchmark_simulation import IndustrialBenchmarkSimulation
 from control.pid_thickener_pressure_simulation import PIDThickenerPressureSimulation
@@ -22,9 +19,9 @@ from omegaconf import DictConfig
 
 # parser = argparse.ArgumentParser('Pressure control Test')
 # parser.add_argument('-R',  type=int, default=400, help="Rounds for Test")
-# parser.add_argument('--simulation', type=str, default='control/model/cstr_vrnn_5_cpu.pkl', help='ckpt path of simulation model.')
-# parser.add_argument('--planning',  type=str, default='control/model/cstr_vrnn_5_cpu.pkl', help="ckpt path of planning model.")
-# parser.add_argument('--ip',  type=str, default='localhost', help="ckpt path of planning model.")
+# parser.add_argument('--simulation', type=str, default='control/trained_model/cstr_vrnn_5_cpu.pkl', help='ckpt path of simulation trained_model.')
+# parser.add_argument('--planning',  type=str, default='control/trained_model/cstr_vrnn_5_cpu.pkl', help="ckpt path of planning trained_model.")
+# parser.add_argument('--ip',  type=str, default='localhost', help="ckpt path of planning trained_model.")
 # parser.add_argument('-v', '--vis', action='store_true', default=False)
 # parser.add_argument('--service', action='store_true', default=False)
 # parser.add_argument('-cuda',  type=int, default=0, help="GPU ID")
@@ -33,8 +30,8 @@ from omegaconf import DictConfig
 # parser.add_argument('--num_iters',  type=int, default=32, help="The number of iters in CEM planning")
 # parser.add_argument('-r', '--random_seed',  type=int, default=1, help="Random seed in experiment")
 # parser.add_argument('-dataset', type=str, default='./data/southeast', help="The simulated dateset")
-# parser.add_argument('-input_dim', type=int, default=1, help="output_dim of model")
-# parser.add_argument('-output_dim', type=int, default=2, help="input_dim of model")
+# parser.add_argument('-input_dim', type=int, default=1, help="output_dim of trained_model")
+# parser.add_argument('-output_dim', type=int, default=2, help="input_dim of trained_model")
 # parser.add_argument('--set_value', type=list, default=[0.8,0.1,0.5], help='The set_value of control')  # [number of output_dim; number of input_dim]
 # parser.add_argument('--port',  type=int, default=6010, help="The number of iters in CEM planning")
 # parser.add_argument('--debug', action='store_true', default=False)
@@ -51,12 +48,12 @@ def get_ob_list(cur_ob_dict):
 # # 归一化
 # def scale(action):
 #
-#     action = (action - model.scale[0])  /  model.scale[1]
+#     action = (action - trained_model.scale[0])  /  trained_model.scale[1]
 #     return action
 #
 # # 反归一化
 # def unscale(obs):
-#     obs = obs * model.scale[1] - model.scale[0]
+#     obs = obs * trained_model.scale[1] - trained_model.scale[0]
 #     return obs
 
 
@@ -71,11 +68,11 @@ def main(args:DictConfig):
         os.makedirs(figs_path)
 
     if args.modeltype == 'darts':
-        from darts.models import RNNModel, BlockRNNModel
+        from darts.models import BlockRNNModel
 
-        model = BlockRNNModel.load_model(os.path.join(hydra.utils.get_original_cwd(), 'model', args.model))
+        model = BlockRNNModel.load_model(os.path.join(hydra.utils.get_original_cwd(), 'trained_model', args.model))
     else:
-        model = torch.load(os.path.join(hydra.utils.get_original_cwd(), 'model', args.model), map_location={'cuda:0': 'cuda:2'})
+        model = torch.load(os.path.join(hydra.utils.get_original_cwd(), 'trained_model', args.model), map_location={'cuda:0': 'cuda:2'})
         model = model.to(device)
 
     logging('save dir = {}'.format(os.getcwd()))

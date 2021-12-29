@@ -1,15 +1,8 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
 import os
-import json
-import time
-import torch
-import hydra
 import random
 import pandas
-from control.utils import dict_to_Tensor
-from common import detect_download
-from control.scale import Scale
 from matplotlib import pyplot as plt
 from control.dynamics.ib.IDS import IDS
 import numpy as np
@@ -70,8 +63,8 @@ class IndustrialBenchmarkSimulation:
         print(self.simulation_time)
 
         # # at 反归一化 函数
-        # at_mean = np.array(self.model.mean.values.tolist()[1:4])
-        # at_std = np.array(self.model.std.values.tolist()[1:4])
+        # at_mean = np.array(self.trained_model.mean.values.tolist()[1:4])
+        # at_std = np.array(self.trained_model.std.values.tolist()[1:4])
         #
         # # 转array矩阵乘,计算过后转回list
         # planning_delta_action = np.array(planning_delta_action) * at_std + at_mean
