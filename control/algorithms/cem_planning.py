@@ -1,20 +1,13 @@
 #!/usr/bin/python
 # -*- coding:utf8 -*-
 import numpy as np
-import math
 import os
-import json
 
 import torch
-import pandas as pd
-import copy
 from torch.distributions.normal import Normal
-from control.thickener_pressure_simulation import ThickenerPressureSimulation
-from control.scale import Scale
-from matplotlib import pyplot as plt
+
+
 #####
-from model.func import normal_differential_sample
-from model.common import DiagMultivariateNormal as MultivariateNormal
 #####
 
 
@@ -116,7 +109,7 @@ class CEMPlanning:
                 2. 优化last_seq_distribution
                 """
                 action_j = last_seq_distribution.sample((self.num_samples, ))     # tensor.shape
-                action_j = action_j.permute(1, 0, 2).contiguous()   # model.forward_prediction(([len, batch_size, input_size]), memory_state)
+                action_j = action_j.permute(1, 0, 2).contiguous()   # trained_model.forward_prediction(([len, batch_size, input_size]), memory_state)
                 # TODO : 不同的模型memory_state定义不同，需要兼容
                 memory_state['hn'] = memory_state['hn'].expand(self.num_samples, memory_state['hn'].shape[-1]).contiguous()
                 memory_state['rnn_hidden'] = memory_state['rnn_hidden'].expand(memory_state['rnn_hidden'].shape[0], self.num_samples, memory_state['rnn_hidden'].shape[-1]).contiguous()

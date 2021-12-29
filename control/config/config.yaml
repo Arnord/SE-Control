@@ -1,4 +1,4 @@
-# model: ib_vrnn_5_1026.pkl # ckpt path of planning model.
+# trained_model: ib_vrnn_5_1026.pkl # ckpt path of planning trained_model.
 model: ib_vrnn_5_1026.pkl
 cuda: 0 # GPU ID, -1 for CPU
 input_dim: 3 # Dimension of system input
